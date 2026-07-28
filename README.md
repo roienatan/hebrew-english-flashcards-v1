@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Citizen Café Flashcards
 
-## Getting Started
+Hebrew ↔ English flashcards
 
-First, run the development server:
+## Stack
+
+- Next.js
+- Tailwind
+- PostgreSQL (on Neon)
+- Prisma
+
+## Setup
 
 ```bash
+npm install
+add .env file with the correct DATABASE_URL
+npm run db:migrate
+npm run db:seed
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Schema
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+Level (tier, color, order)
+  └── Type? (only for some Freedom levels)
+        └── Card (hebrew, english)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Levels are the main thing (Red, Orange, etc).  
+Types only exist for Dark Green (4), Turquoise (4), and Indigo (6) — same level, different content packs.  
+Other levels have no type, so `typeId` is null on those cards.
 
-## Learn More
+Tier lives on Level, not on every card. Simpler that way.
 
-To learn more about Next.js, take a look at the following resources:
+## Key decisions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Neon + Prisma — real Postgres, no local DB to manage
+- Server Actions to load cards — small app, didn’t need a full API
+- Vocab in a seed file — generated offline, then seeded. No LLM in the app
+- useTransition for loading state — cleaner than manual loading flags (left the useState version commented)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Trade-offs
 
-## Deploy on Vercel
+- Simple vocab for demo app
+- No saved progress yet — better with localStorage and ideally with auth and DB
+- Shuffle should have a better algorithm
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## TODO (with more time)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Mark words as "Repeat" and "Know" so the system knows to re-show cards that marked as "Repeat" (need to update localStorage or ideally with DB and auth)
+- Typing answers (for writing practice)
+- Save progress (same as above, need either localStorage or auth and DB)
+- Keyboard shortcuts (next and flip)
+- Better shuffle logic
+
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `npm run dev` | Local Next.js server |
+| `npm run db:migrate` | Create/apply migrations |
+| `npm run db:seed` | Load `seed/data.ts` into Neon |
+| `npm run db:studio` | Browse data in Prisma Studio |
+| `npm run build` | Generate client + production build |
+
+## Design note
+
+See `citizen-cafe-design-bible.md`
