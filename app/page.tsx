@@ -7,9 +7,9 @@ export default async function Home() {
 
   try {
     levels = await getLevels();
-  } catch {
+  } catch (err) {
     dbError =
-      "DB ERROR - make sure .env is set and migations script ran";
+      "DB ERROR - " + (err instanceof Error ? err.message : "unknown");
   }
 
   return (
